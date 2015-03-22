@@ -70,6 +70,9 @@ app.get('/room', function(req, res, next){
     var currentUser = req.session.currentUser || null;
     if(currentUser){
         res.render('room', currentUser);
+        if(io.sockets){
+            io.sockets.in('defaultRoom').emit('setChatters', currentUser);
+        }
     }else{
         var object = { message : 'invalid user !!' };
         res.render('home' , object);
@@ -99,7 +102,7 @@ io.sockets.on('connection', function (socket) {
                         UtilsDB.savePicture(socket.uEmail, file.name, function(chatter){
                             console.info('File saved.');
                             console.info(chatter);
-                            socket.emit('updatePicture', chatter);
+                            io.sockets.in('defaultRoom').emit('updatePicture', chatter);
                         });
                     }else{
                         console.info('error no UEmail defined');
@@ -115,6 +118,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('register', function(data){
         socket.uEmail = data;
+        socket.join('defaultRoom');
     });
 
     socket.on('disconnect', function() {

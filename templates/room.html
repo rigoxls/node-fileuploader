@@ -69,8 +69,6 @@
 <body>
     <div class="container">
         <ul id="listview-userlist">
-            <li>Name 1</li>
-            <li>Name 2</li>
         </ul>
 
         <div id="currentProfile">
@@ -80,8 +78,8 @@
             <div class="userPic"><img src="/photos/{{picture}}" width="80" id="cUserPhoto"></div>
             <div class="userInfo">
                 <div class="userNickname">Name: {{ name }}</div>
-                <div class="userRegio">Age: {{ age }}</div>
-                <div class="userAge">email: {{ email }}</div>
+                <div class="userAge">Age: {{ age }}</div>
+                <div class="userEmail">email: {{ email }}</div>
             </div>
             <div class="clearFix"></div>
             <div class="notallowedMsg">Only profile pictures are allowed</div>
@@ -93,11 +91,11 @@
             <div class="profileHeader">
                 <span class="profileHeaderName">{{ nickName }}</span>
             </div>
-            <div class="userPic">Foto</div>
+            <div class="userPic"></div>
             <div class="userInfo">
-                <div class="userNickname">Name: {{ name }}</div>
-                <div class="userAge">Age: {{ age }}</div>
-                <div class="userRegio">Email: {{ email }}</div>
+                <div class="userNickname"></div>
+                <div class="userAge"></div>
+                <div class="userEmail"></div>
             </div>
         </div>
 
@@ -115,7 +113,22 @@
                  socket.emit('register', uEmail);
 
                  socket.on('updatePicture', function(data){
-                    $('#cUserPhoto').attr('src', '/photos/' + data.picture);
+                    //if user is updating hiw own picture
+                    if(data.email == uEmail){
+                        $('#cUserPhoto').attr('src', '/photos/' + data.picture);
+                    }
+                    else{
+                        $('li[data-email="' + data.email + '"]').attr('data-picture', data.picture);
+                    }
+                 });
+
+                 socket.on('setChatters', function(data){
+                    if(!data.picture){
+                        data.picture = '';
+                    }
+
+                    $('#listview-userlist').append('<li data-email="' + data.email+ '" data-picture="' + data.picture + '" data-age="' + data.age + '">' + data.name + '</li>')
+
                  });
 
                  var delivery = new Delivery(socket);
@@ -133,11 +146,12 @@
                 });
               });
 
-             var userList = $('#listview-userlist li'),
+
+             var userList = $('#listview-userlist'),
                  showProfile = $('#showProfile'),
                  nicknameVal = $('#showProfile .profileHeaderName');
 
-              userList.hover(function(){
+             userList.on( "mouseover", "li", function(e) {
                 var pos = $(this).position();
 
                 showProfile.css('display', 'block');
@@ -145,9 +159,16 @@
                 showProfile.css("left", (pos.left + 70) + 'px');
 
                 nicknameVal.html($(this).text());
-              }, function(){
-                  showProfile.css('display', 'none');
-              });
+                showProfile.find('.userNickname').text($(this).text());
+                showProfile.find('.userEmail').text($(this).attr('data-email'));
+                showProfile.find('.userAge').text($(this).attr('data-age'));
+                showProfile.find('.userPic').empty().append('<img src="/photos/' + $(this).attr('data-picture') + '" width="80">');
+            });
+
+            userList.on( "mouseleave", "li", function(e) {
+                showProfile.css('display', 'none');
+            });
+
         });
     </script>
 </body>
