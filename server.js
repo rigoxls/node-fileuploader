@@ -64,7 +64,7 @@ app.post('/go_room', function(req, res, next){
 });
 
 app.get('/room', function(req, res, next){
-    res.send('you are in room now');
+    res.render('room');
 });
 
 server.listen(app.get('port'), function(){

@@ -3,28 +3,122 @@
 <head>
 <meta charset="utf-8">
 <title>Fileuploader room</title>
-<style></style>
+<style>
+    #currentProfile{
+      width: 300px;
+      border: 1px gray solid;
+      -webkit-border-radius: 2px;
+      position:relative;
+      background-color: #FFFFFF;
+      margin: 0 auto;
+    }
 
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.js"></script>
+    #showProfile{
+      display: none;
+      width: 300px;
+      border: 1px gray solid;
+      -webkit-border-radius: 2px;
+      position:absolute;
+      background-color: #FFFFFF;
+    }
+    .profileHeader {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      background: rgba(231, 10, 46, 0.86);
+    }
 
+    .currentHeader{
+        background: rgba(131, 100, 46, 0.86);
+    }
+
+    .profileHeaderName {
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    .userPic {
+      float: left;
+      width: 80px;
+      height: 80px;
+      border: 1px gray solid;
+      margin: 10px;
+
+    }
+    .userInfo {
+      margin-top: 10px;
+    }
+    .clearFix {
+      clear: both;
+    }
+    #uploadPic {
+      margin-left: 4px;
+      margin-bottom: 4px;
+      width: 292px;
+    }
+    .notallowedMsg {
+        color: red;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+</style>
+
+<script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
 </head>
+
 <body>
-<div class="container">
-    <section id="content">
-        <form id="login" method="post" action="/go_room/">
-            <h1>Login Form</h1>
-            <h3>{{ message }} </h3>
-            <div>
-                <input type="text" placeholder="Username" required="" id="username" name="username" />
+    <div class="container">
+        <ul id="listview-userlist">
+            <li>Name 1</li>
+            <li>Name 2</li>
+        </ul>
+
+        <div id="currentProfile">
+            <div class="profileHeader currentHeader">
+                <span class="profileHeaderName">Nickname</span>
             </div>
-            <div>
-                <input type="password" placeholder="Password" required="" id="password" name="password"/>
+            <div class="userPic">Foto</div>
+            <div class="userInfo">
+                <div class="userNickname">Nickname: value</div>
+                <div class="userAge">Age: value</div>
+            <div class="userRegio">Region: value</div>
             </div>
-            <div>
-                <input type="submit" value="Log in" />
+            <div class="clearFix"></div>
+            <div class="notallowedMsg">Only profile pictures are allowed</div>
+            <button id="uploadPic">Upload</button>
+        </div>
+
+
+        <div id="showProfile">
+            <div class="profileHeader">
+                <span class="profileHeaderName">Nickname</span>
             </div>
-        </form>
-    </section>
-</div>
+            <div class="userPic">Foto</div>
+            <div class="userInfo">
+                <div class="userNickname">Nickname: value</div>
+                <div class="userAge">Age: value</div>
+                <div class="userRegio">Region: value</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        jQuery(function($){
+         var userList = $('#listview-userlist li'),
+             showProfile = $('#showProfile'),
+             nicknameVal = $('#showProfile .profileHeaderName');
+
+          userList.hover(function(){
+            var pos = $(this).position();
+
+            showProfile.css('display', 'block');
+            showProfile.css("top", pos.top + 'px');
+            showProfile.css("left", (pos.left + 70) + 'px');
+
+            nicknameVal.html($(this).text());
+          }, function(){
+              showProfile.css('display', 'none');
+          });
+        });
+    </script>
 </body>
 </html>
