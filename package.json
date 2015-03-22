@@ -1,0 +1,17 @@
+{
+  "name": "fileuploaderTest",
+  "version": "1.0.1",
+  "description": "a test fileuploader",
+  "author": "rigoxls",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "~4.11.2",
+    "swig": "~1.4.2",
+    "socket.io": "~1.3.4",
+    "body-parser": "~1.12.0",
+    "lodash": "~3.3.0",
+    "random-token": "0.0.8",
+    "express-session": "~1.10.3",
+    "mongoose": "~3.8.23"
+  }
+}
