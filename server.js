@@ -1,6 +1,8 @@
 var http = require('http'),
     swig = require('swig'),
     io = require('socket.io'),
+    dl  = require('delivery'),
+    fs  = require('fs');
     express = require('express'),
     path = require('path'),
     mongoose = require('mongoose'),
@@ -53,6 +55,7 @@ app.post('/go_room', function(req, res, next){
                 var object = { message : 'invalid credentials !!' };
                 res.render('home' , object);
             }else{
+                req.session.currentUser = chatter;
                 res.redirect('/room/');
             }
         }else{
@@ -64,8 +67,61 @@ app.post('/go_room', function(req, res, next){
 });
 
 app.get('/room', function(req, res, next){
-    res.render('room');
+    var currentUser = req.session.currentUser || null;
+    if(currentUser){
+        res.render('room', currentUser);
+    }else{
+        var object = { message : 'invalid user !!' };
+        res.render('home' , object);
+    }
 });
+
+
+// socket io connections
+io.sockets.on('connection', function (socket) {
+
+    //create an instance of delivery
+    var delivery = dl.listen(socket);
+
+    //get file from local
+    delivery.on('receive.success',function(file){
+        var fileExt = path.extname(file.name.toLowerCase()).substr(1);
+
+        //just validate basic extensions for images
+        if(fileExt == 'jpg' || fileExt == 'png' || fileExt == 'gif'){
+            var pathImage = __dirname + '/public/photos/' + file.name;
+
+            fs.writeFile(pathImage , file.buffer , function(err){
+                if(err){
+                    console.info('Error saving file.');
+                }else{
+                    if(socket.uEmail){
+                        UtilsDB.savePicture(socket.uEmail, file.name, function(chatter){
+                            console.info('File saved.');
+                            console.info(chatter);
+                            socket.emit('updatePicture', chatter);
+                        });
+                    }else{
+                        console.info('error no UEmail defined');
+                    }
+                };
+            });
+        }else{
+            var oMessage = { 'message' : "error file is not an image"};
+            socket.emit('message', oMessage);
+        }
+
+    });
+
+    socket.on('register', function(data){
+        socket.uEmail = data;
+    });
+
+    socket.on('disconnect', function() {
+        console.info('disconnect');
+    });
+});
+
 
 server.listen(app.get('port'), function(){
   console.log('express server listening in port : ' + app.get('port'));

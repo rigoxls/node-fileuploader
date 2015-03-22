@@ -12,7 +12,8 @@ var user1 = new ChatterTB({
     name: 'francis',
     email: 'francis@test.com',
     password: '123456',
-    nickname : 'frank'
+    nickname : 'frank',
+    age: '40'
 });
 
 user1.save(function(err){
@@ -28,7 +29,8 @@ var user2 = new ChatterTB({
     name: 'denial',
     email: 'denial@test.com',
     password: '123456',
-    nickname : 'denial'
+    nickname : 'denial',
+    age: '30'
 });
 
 user2.save(function(err){
@@ -43,7 +45,8 @@ var user3 = new ChatterTB({
     name: 'drake',
     email: 'drake@test.com',
     password: '123456',
-    nickname : 'drake'
+    nickname : 'drake',
+    age: '25'
 });
 
 user3.save(function(err){

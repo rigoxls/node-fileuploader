@@ -62,6 +62,8 @@
 </style>
 
 <script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/delivery.js"></script>
 </head>
 
 <body>
@@ -73,29 +75,29 @@
 
         <div id="currentProfile">
             <div class="profileHeader currentHeader">
-                <span class="profileHeaderName">Nickname</span>
+                <span class="profileHeaderName">{{ name }}</span>
             </div>
-            <div class="userPic">Foto</div>
+            <div class="userPic"><img src="/photos/{{picture}}" width="80" id="cUserPhoto"></div>
             <div class="userInfo">
-                <div class="userNickname">Nickname: value</div>
-                <div class="userAge">Age: value</div>
-            <div class="userRegio">Region: value</div>
+                <div class="userNickname">Name: {{ name }}</div>
+                <div class="userRegio">Age: {{ age }}</div>
+                <div class="userAge">email: {{ email }}</div>
             </div>
             <div class="clearFix"></div>
             <div class="notallowedMsg">Only profile pictures are allowed</div>
-            <button id="uploadPic">Upload</button>
+            <input type="file" id="uploadPic" name="uploadPic">
         </div>
 
 
         <div id="showProfile">
             <div class="profileHeader">
-                <span class="profileHeaderName">Nickname</span>
+                <span class="profileHeaderName">{{ nickName }}</span>
             </div>
             <div class="userPic">Foto</div>
             <div class="userInfo">
-                <div class="userNickname">Nickname: value</div>
-                <div class="userAge">Age: value</div>
-                <div class="userRegio">Region: value</div>
+                <div class="userNickname">Name: {{ name }}</div>
+                <div class="userAge">Age: {{ age }}</div>
+                <div class="userRegio">Email: {{ email }}</div>
             </div>
         </div>
 
@@ -103,21 +105,49 @@
 
     <script type="text/javascript">
         jQuery(function($){
-         var userList = $('#listview-userlist li'),
-             showProfile = $('#showProfile'),
-             nicknameVal = $('#showProfile .profileHeaderName');
 
-          userList.hover(function(){
-            var pos = $(this).position();
+            var uEmail = '{{email}}';
 
-            showProfile.css('display', 'block');
-            showProfile.css("top", pos.top + 'px');
-            showProfile.css("left", (pos.left + 70) + 'px');
+            //create a connection with socket, by default io variable is sponsor by socket lib
+            var socket = io.connect('http://localhost:3000');
 
-            nicknameVal.html($(this).text());
-          }, function(){
-              showProfile.css('display', 'none');
-          });
+             socket.on('connect', function(){
+                 socket.emit('register', uEmail);
+
+                 socket.on('updatePicture', function(data){
+                    $('#cUserPhoto').attr('src', '/photos/' + data.picture);
+                 });
+
+                 var delivery = new Delivery(socket);
+
+                 delivery.on('delivery.connect',function(delivery){
+                     $("#uploadPic").change(function(evt){
+                         var file = $(this)[0].files[0];
+                         delivery.send(file);
+                         evt.preventDefault();
+                     });
+                 });
+
+                delivery.on('send.success',function(fileUID){
+                    console.log("file was upload successfully.");
+                });
+              });
+
+             var userList = $('#listview-userlist li'),
+                 showProfile = $('#showProfile'),
+                 nicknameVal = $('#showProfile .profileHeaderName');
+
+              userList.hover(function(){
+                var pos = $(this).position();
+
+                showProfile.css('display', 'block');
+                showProfile.css("top", pos.top + 'px');
+                showProfile.css("left", (pos.left + 70) + 'px');
+
+                nicknameVal.html($(this).text());
+              }, function(){
+                  showProfile.css('display', 'none');
+              });
         });
     </script>
 </body>
