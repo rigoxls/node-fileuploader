@@ -13,6 +13,8 @@ var server = http.createServer(app);
 io = io.listen(server);
 
 //setting swig
+app.engine('html', swig.renderFile);
+app.set('view engine', 'html');
 app.set('view cache', false);
 swig.setDefaults({cache: false});
 
@@ -30,7 +32,9 @@ app.set('port', process.env.PORT || 3000);
 
 //routes
 app.get('/home', function(req, res, next){
-    res.send('this is home route');
+
+    var object = { text : 'sometext' };
+    res.render('home', object);
 });
 
 server.listen(app.get('port'), function(){
